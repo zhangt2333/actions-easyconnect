@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo ln -s /usr/share/sangfor/EasyConnect/resources/{conf_7.6.8,conf}
+sudo ln -s /usr/share/sangfor/EasyConnect/resources/{conf_7.6.8,conf}  2>/dev/null
 sudo nohup /usr/share/sangfor/EasyConnect/resources/bin/ECAgent &
 sleep 1
 # easyconn login

@@ -6,7 +6,7 @@ inputs:
     description: '-d {vpnUrl} -u {username} -p {password}'
     required: true
   SCRIPT:
-    description: 'your script'
+    description: 'Your script'
     required: false
   SLEEP_AFTER_LOGIN:
     description: "How many seconds to sleep after login"
@@ -16,6 +16,10 @@ inputs:
     description: "How many times to retry after error"
     required: false
     default: 1
+  EXPECTED_EXIT_CODE:
+    description: "Which exception exit code (not 0) is your expectation"
+    required: false
+    default: 0
 
 runs: 
   using: 'composite'
@@ -34,26 +38,30 @@ runs:
         do
           echo "try_$_retry" `date`
           bash ${{ github.action_path }}/start.sh
-          if [[ $? != 0 ]]
+          exitCode=$?
+          if [[ $exitCode != 0 ]]
           then
+            cnt=$(($cnt+1))
             bash ${{ github.action_path }}/stop.sh
+            sleep 3
             continue
           fi
           sleep ${{ inputs.SLEEP_AFTER_LOGIN }}
           
           ${{ inputs.SCRIPT }}
-          if [[ $? == 0 ]]
+          exitCode=$?
+          echo "user code exit code: "$exitCode
+          if [[ $exitCode == 0 || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
           then
             bash ${{ github.action_path }}/stop.sh
             break
           else
             cnt=$(($cnt+1))  
-            echo "user code exit code: "$?
             bash ${{ github.action_path }}/stop.sh
           fi
         done
         set -e
-        if [[ $cnt == ${{ inputs.RETRY }} ]]
+        if [[ $cnt == ${{ inputs.RETRY }} || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
         then
           exit -1
         fi
