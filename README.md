@@ -14,7 +14,7 @@ Run code within EasyConnect VPN !
 
 ## Usage
 
-举例（完整例子在 [zhangt2333/actions-SduElectricityReminder](https://github.com/zhangt2333/actions-SduElectricityReminder/blob/26d9c37a231f2bea89b2eb8117c0b0d2717a0f2e/.github/workflows/SduElectricityReminder.yml#L23-L38)，一个使用 [actions-easyconnect](https://github.com/zhangt2333/actions-easyconnect) 让校外服务器查询校内宿舍电量，低电提醒的 Github Actions）：
+举例（完整例子在 [zhangt2333/actions-SduElectricityReminder](https://github.com/zhangt2333/actions-SduElectricityReminder/blob/26d9c37a231f2bea89b2eb8117c0b0d2717a0f2e/.github/workflows/SduElectricityReminder.yml#L28-L38)，一个使用 [actions-easyconnect](https://github.com/zhangt2333/actions-easyconnect) 让校外服务器查询校内宿舍电量，低电提醒的 Github Actions）：
 
 ```
       - name: Run Spider in VPN
