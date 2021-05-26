@@ -3,15 +3,19 @@ description: 'run your scripts in easyconnect!'
 
 inputs:
   CLI_OPTS:
-    description: "format: '-d {vpnUrl} -u {username} -p {password}'"
+    description: '-d {vpnUrl} -u {username} -p {password}'
     required: true
   SCRIPT:
-    description: "your script"
+    description: 'your script'
     required: false
   SLEEP_AFTER_LOGIN:
     description: "How many seconds to sleep after login"
     required: false
     default: 5
+  RETRY:
+    description: "How many times to retry after error"
+    required: false
+    default: 1
 
 runs: 
   using: 'composite'
@@ -19,16 +23,37 @@ runs:
     - id: install-easyconnect
       run: sudo bash ${{ github.action_path }}/prerequisite.sh
       shell: bash
-    - id: start-easyconnect
-      run: |
-        bash ${{ github.action_path }}/start.sh &
-        sleep ${{ inputs.SLEEP_AFTER_LOGIN }}
+    - id: run-it
       shell: bash
-      env: 
+      env:
         CLI_OPTS:  ${{ inputs.CLI_OPTS }}
-    - id: run-user-code
-      run: ${{ inputs.SCRIPT }}
-      shell: bash
-    - id: stop-easyconnect
-      run: bash ${{ github.action_path }}/stop.sh
-      shell: bash
+      run: |
+        cnt=0
+        set +e
+        for _retry in {1..${{ inputs.RETRY }}} 
+        do
+          echo "try_$_retry" `date`
+          bash ${{ github.action_path }}/start.sh
+          if [[ $? != 0 ]]
+          then
+            bash ${{ github.action_path }}/stop.sh
+            continue
+          fi
+          sleep ${{ inputs.SLEEP_AFTER_LOGIN }}
+          
+          ${{ inputs.SCRIPT }}
+          if [[ $? == 0 ]]
+          then
+            bash ${{ github.action_path }}/stop.sh
+            break
+          else
+            cnt=$(($cnt+1))  
+            echo "user code exit code: "$?
+            bash ${{ github.action_path }}/stop.sh
+          fi
+        done
+        set -e
+        if [[ $cnt == ${{ inputs.RETRY }} ]]
+        then
+          exit -1
+        fi
