@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Credits: https://github.com/Hagb/docker-easyconnect/blob/master/docker-root/usr/local/bin/start-sangfor.sh
+
 sudo ln -s /usr/share/sangfor/EasyConnect/resources/{conf_7.6.8,conf}  2>/dev/null
 sudo nohup /usr/share/sangfor/EasyConnect/resources/bin/ECAgent &
 sleep 1

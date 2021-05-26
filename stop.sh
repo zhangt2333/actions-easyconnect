@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Credits: https://github.com/Hagb/docker-easyconnect/blob/master/docker-root/usr/local/bin/start-sangfor.sh
+
 # easyconn logout
 sudo bash -c "exec easyconn logout" >/dev/null 2>/dev/null
 sleep 2

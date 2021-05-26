@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Credits: https://github.com/Hagb/docker-easyconnect/blob/master/Dockerfile.cli
+# Credits: https://github.com/Hagb/docker-easyconnect/blob/master/docker-root/usr/local/bin/start.sh
+
 apt-get update
 apt-get install -y --no-install-recommends --no-install-suggests iptables busybox curl
 for command in ip ps kill killall; do ln -s "$(which busybox)" /usr/local/bin/"${command}" || exit 1 ; done
