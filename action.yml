@@ -17,9 +17,13 @@ inputs:
     required: false
     default: 1
   EXPECTED_EXIT_CODE:
-    description: "Which exception exit code (not 0) is your expectation"
+    description: "Which exception code (not 0) is your expectation"
     required: false
     default: 0
+  EXPECTED_IGNORE_CODE:
+    description: "Which exception code (not 0) you want to ignore"
+    required: false
+    default: 255
 
 runs: 
   using: 'composite'
@@ -61,7 +65,7 @@ runs:
           fi
         done
         set -e
-        if [[ $cnt == ${{ inputs.RETRY }} || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
+        if [[ $cnt == ${{ inputs.RETRY }} || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} && $exitCode != ${{ inputs.EXPECTED_IGNORE_CODE }}]]
         then
           exit -1
         fi
