@@ -46,6 +46,7 @@ runs:
           if [[ $exitCode != 0 ]]
           then
             cnt=$(($cnt+1))
+            echo "connection error code: "$exitCode
             bash ${{ github.action_path }}/stop.sh
             sleep 3
             continue
