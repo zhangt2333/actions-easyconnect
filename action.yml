@@ -72,5 +72,6 @@ runs:
         set -e
         if [[ $cnt == ${{ inputs.RETRY }} || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} && $exitCode != ${{ inputs.EXPECTED_IGNORE_CODE }} ]]
         then
+          echo "hit error:"$exitCode
           exit -1
         fi
