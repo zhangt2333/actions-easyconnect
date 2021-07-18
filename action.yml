@@ -51,18 +51,22 @@ runs:
             sleep 3
             continue
           fi
+
           sleep ${{ inputs.SLEEP_AFTER_LOGIN }}
-          
-          ${{ inputs.SCRIPT }}
-          exitCode=$?
-          echo "user code exit code: "$exitCode
-          if [[ $exitCode == 0 || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
+
+          if [[ $exitCode == 0 ]]
           then
-            bash ${{ github.action_path }}/stop.sh
-            break
-          else
-            cnt=$(($cnt+1))  
-            bash ${{ github.action_path }}/stop.sh
+            ${{ inputs.SCRIPT }}
+            exitCode=$?
+            echo "user code exit code: "$exitCode
+            if [[ $exitCode == 0 || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
+            then
+              bash ${{ github.action_path }}/stop.sh
+              break
+            else
+              cnt=$(($cnt+1))  
+              bash ${{ github.action_path }}/stop.sh
+            fi
           fi
         done
         set -e
