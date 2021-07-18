@@ -17,9 +17,13 @@ inputs:
     required: false
     default: 1
   EXPECTED_EXIT_CODE:
-    description: "Which exception exit code (not 0) is your expectation"
+    description: "Which exception code (not 0) is your expectation"
     required: false
     default: 0
+  EXPECTED_IGNORE_CODE:
+    description: "Which exception code (not 0) you want to ignore"
+    required: false
+    default: 255
 
 runs: 
   using: 'composite'
@@ -42,26 +46,32 @@ runs:
           if [[ $exitCode != 0 ]]
           then
             cnt=$(($cnt+1))
+            echo "connection error code: "$exitCode
             bash ${{ github.action_path }}/stop.sh
             sleep 3
             continue
           fi
+
           sleep ${{ inputs.SLEEP_AFTER_LOGIN }}
-          
-          ${{ inputs.SCRIPT }}
-          exitCode=$?
-          echo "user code exit code: "$exitCode
-          if [[ $exitCode == 0 || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
+
+          if [[ $exitCode == 0 ]]
           then
-            bash ${{ github.action_path }}/stop.sh
-            break
-          else
-            cnt=$(($cnt+1))  
-            bash ${{ github.action_path }}/stop.sh
+            ${{ inputs.SCRIPT }}
+            exitCode=$?
+            echo "user code exit code: "$exitCode
+            if [[ $exitCode == 0 || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
+            then
+              bash ${{ github.action_path }}/stop.sh
+              break
+            else
+              cnt=$(($cnt+1))  
+              bash ${{ github.action_path }}/stop.sh
+            fi
           fi
         done
         set -e
-        if [[ $cnt == ${{ inputs.RETRY }} || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
+        if [[ $exitCode != ${{ inputs.EXPECTED_IGNORE_CODE }} && $cnt == ${{ inputs.RETRY }} || $exitCode == ${{ inputs.EXPECTED_EXIT_CODE }} ]]
         then
+          echo "hit error:"$exitCode
           exit -1
         fi
